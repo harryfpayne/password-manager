@@ -6,15 +6,22 @@ import (
 	"github.com/harryfpayne/password-manager/cmd/vault"
 )
 
+const email = "a@b.c"
+const password = "real-password"
+
 func main() {
-	v := vault.NewVault()
-	v.Profiles = append(v.Profiles, vault.Profile{
-		Email:                   "a@b.c",
-		EncryptedMasterPassword: "alskdjf",
-	})
+	v, err := vault.NewVault(email, password)
+	if err != nil {
+		panic(err)
+	}
+
+	err = v.CreateEntry(email, password, "https://www.google.com", "google-password")
+	if err != nil {
+		panic(err)
+	}
 
 	cfg := filesystem.NewConfig()
-	err := cfg.WriteVault(&v)
+	err = cfg.WriteVault(&v)
 	if err != nil {
 		panic(err)
 	}
@@ -24,5 +31,16 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(v2)
+	badPassword := "real-password"
+	err = v2.Login(email, badPassword)
+	if err != nil {
+		panic(err)
+	}
+
+	_password, err := v2.GetPassword("https://www.google.com")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Got password: ", _password, _password == "google-password")
 }
