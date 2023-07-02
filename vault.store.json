@@ -1,0 +1,16 @@
+{
+  "entries": [
+    {
+      "url": "c7977c90b56e55f3fe0e92db0bc73b21397e8e3a412e111eaa7a9fe5f78a06a5",
+      "itemKey": "d5e241d07cb72a36b4c28db11d45477c1f52956fb1ac7a8cc4bd274f28560142e28aea517dbb0582ec638b25c86f761e91148b110b9b389f0d2a99e5e11357f5e1375d9e1f55aaef8d2b27c6d734925c20cdffb72ce199b46f287caa7c45fc80",
+      "itemPassword": "5c5f3496ec000aad4da28c44e882b8a3ff2547522a52fb30c32f2dfe249b7a1f"
+    }
+  ],
+  "profiles": [
+    {
+      "email": "a@b.c",
+      "masterPassword": "ec51fddf729d6bc2d1eb94f90c1167023604032f6735c776ab001218d24fb6e34a4c891b047bdb0cfadd440438c5554d66ab76069c66cd9a0cf7d854ec5426a5f41b466047ae607d54ccc640b17da64316c3bda82155a898076b21f36492d187"
+    }
+  ],
+  "Salt": "ef336448f34c33cc039e47002bee3377"
+}

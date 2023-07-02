@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"github.com/harryfpayne/password-manager/cmd/crypto"
 )
@@ -55,10 +56,13 @@ func (u EncryptedString) MarshalJSON() ([]byte, error) {
 		panic("tried to store unencrypted string")
 	}
 
-	return json.Marshal(u.e)
+	return []byte("\"" + hex.EncodeToString(u.e) + "\""), nil
 }
 
 func (u *EncryptedString) UnmarshalJSON(data []byte) error {
 	u.Encrypted = true
-	return json.Unmarshal(data, &u.e)
+
+	u.e = make([]byte, hex.DecodedLen(len(data[1:len(data)-1])))
+	_, err := hex.Decode(u.e, data[1:len(data)-1])
+	return err
 }

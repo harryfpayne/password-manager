@@ -8,6 +8,7 @@ import (
 type Vault struct {
 	Entries  []Entry   `json:"entries"`
 	Profiles []Profile `json:"profiles"`
+	Salt     string
 }
 
 type Profile struct {
@@ -21,13 +22,18 @@ type Entry struct {
 	ItemPassword EncryptedString `json:"itemPassword"`
 }
 
+const SALT_LENGTH = 16
+const MASTER_PASSWORD_LENGTH = 32
+const ITEM_KEY_LENGTH = 32
+
 func NewVault(rootEmail, rootPassword string) (Vault, error) {
 	v := Vault{
 		Entries:  []Entry{},
 		Profiles: []Profile{},
+		Salt:     crypto.RandomString(SALT_LENGTH),
 	}
 
-	err := v.CreateProfile(crypto.RandomString(), rootEmail, rootPassword)
+	err := v.CreateProfile(crypto.RandomString(MASTER_PASSWORD_LENGTH), rootEmail, rootPassword)
 	if err != nil {
 		return Vault{}, err
 	}
@@ -37,7 +43,7 @@ func NewVault(rootEmail, rootPassword string) (Vault, error) {
 func (v *Vault) CreateProfile(masterPassword string, email string, password string) error {
 	profileMasterPassword := NewEncryptedString(masterPassword)
 
-	derivedKey := crypto.GetDerivedKey(password)
+	derivedKey := crypto.GetDerivedKey(password, v.Salt)
 	profileMasterPassword = profileMasterPassword.Encrypt(derivedKey)
 
 	v.Profiles = append(v.Profiles, Profile{
@@ -55,7 +61,7 @@ func (v *Vault) CreateEntry(email, password, _url, _password string) error {
 
 	url := NewEncryptedString(_url).Encrypt(masterPassword.S())
 
-	itemKey := NewEncryptedString(crypto.RandomString())
+	itemKey := NewEncryptedString(crypto.RandomString(ITEM_KEY_LENGTH))
 
 	itemPassword := NewEncryptedString(_password).Encrypt(itemKey.S())
 
@@ -136,14 +142,10 @@ func (v Vault) getMasterPassword(email, password string) (EncryptedString, error
 	var profile Profile
 	for _, profile = range v.Profiles {
 		if profile.Email == email {
-			break
+			derivedKey := crypto.GetDerivedKey(password, v.Salt)
+			return profile.MasterPassword.Decrypt(derivedKey), nil
 		}
 	}
 
-	if profile.Email == "" {
-		return EncryptedString{}, fmt.Errorf("no profile found for email %s", email)
-	}
-
-	derivedKey := crypto.GetDerivedKey(password)
-	return profile.MasterPassword.Decrypt(derivedKey), nil
+	return EncryptedString{}, fmt.Errorf("no profile found for email %s", email)
 }

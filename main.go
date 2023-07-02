@@ -15,7 +15,8 @@ func main() {
 		panic(err)
 	}
 
-	err = v.CreateEntry(email, password, "https://www.google.com", "google-password")
+	googlePassword := "google-password"
+	err = v.CreateEntry(email, password, "www.google.com", googlePassword)
 	if err != nil {
 		panic(err)
 	}
@@ -31,16 +32,15 @@ func main() {
 		panic(err)
 	}
 
-	badPassword := "real-password"
-	err = v2.Login(email, badPassword)
+	err = v2.Login(email, password)
 	if err != nil {
 		panic(err)
 	}
 
-	_password, err := v2.GetPassword("https://www.google.com")
+	_password, err := v2.GetPassword("www.google.com")
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Got password: ", _password, _password == "google-password")
+	fmt.Println("Got password: ", _password, _password == googlePassword)
 }

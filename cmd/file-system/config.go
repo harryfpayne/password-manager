@@ -4,7 +4,7 @@ type Config struct {
 	FilePath string
 }
 
-const DEFAULT_FILEPATH = "vault.store"
+const DEFAULT_FILEPATH = "vault.store.json"
 
 func NewConfig() Config {
 	return Config{
